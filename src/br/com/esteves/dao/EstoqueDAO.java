@@ -51,4 +51,28 @@ public class EstoqueDAO {
     }
     return null;
   }
+
+  public void inserir(Produto produto) throws SQLException {
+    try {
+      Connection conn = cf.getConnection();
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "insert into produtos (nome, preco, quantidade) values (?, ?, ?)",
+              Statement.RETURN_GENERATED_KEYS);
+
+      pstmt.setString(1, produto.getNome());
+      pstmt.setDouble(2, produto.getPreco());
+      pstmt.setInt(3, produto.getQuantidade());
+
+      pstmt.executeUpdate();
+      ResultSet generatedKeys = pstmt.getGeneratedKeys();
+
+      if (generatedKeys.next()) {
+        produto.setId(generatedKeys.getInt(1));
+      }
+
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
