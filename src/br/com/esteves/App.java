@@ -19,9 +19,16 @@ public class App {
       System.out.println("Error: " + e.getMessage());
     }
 
+    Produto pendrive = new Produto(0, "PenDrive 32GB", 39.90, 20);
     try {
-      Produto p1 = dao.buscarPorID(1);
-      System.out.println("ID 1: " + p1);
+      dao.inserir(pendrive);
+      System.out.println("New ID=" + pendrive.getId());
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    try {
+      Produto p1 = dao.buscarPorID(pendrive.getId());
+      System.out.printf("ID %d: %s", pendrive.getId(), pendrive);
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
