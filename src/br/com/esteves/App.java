@@ -18,9 +18,10 @@ public class App {
     } catch (Exception e) {
       System.out.println("Error: " + e.getMessage());
     }
+
     try {
-      List<Produto> produtos = dao.listarTodos();
-      produtos.forEach(System.out::println);
+      Produto p1 = dao.buscarPorID(1);
+      System.out.println("ID 1: " + p1);
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

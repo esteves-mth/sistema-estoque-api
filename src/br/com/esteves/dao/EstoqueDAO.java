@@ -3,10 +3,7 @@ package br.com.esteves.dao;
 import br.com.esteves.db.ConnectionFactory;
 import br.com.esteves.model.Produto;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,5 +33,22 @@ public class EstoqueDAO {
       throw new RuntimeException(e);
     }
     return list;
+  }
+
+  public Produto buscarPorID(int id) throws SQLException {
+    String sql = "select * from produtos where id = ?";
+    try {
+      Connection conn = cf.getConnection();
+      PreparedStatement pstmt = conn.prepareStatement(sql);
+      pstmt.setInt(1, id);
+      ResultSet rs = pstmt.executeQuery();
+      if (rs.next()) {
+        return new Produto(
+            rs.getInt("id"), rs.getString("nome"), rs.getDouble("preco"), rs.getInt("quantidade"));
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    return null;
   }
 }
