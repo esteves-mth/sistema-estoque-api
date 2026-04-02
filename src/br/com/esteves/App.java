@@ -19,7 +19,14 @@ public class App {
       System.out.println("Error: " + e.getMessage());
     }
 
-    Produto pendrive = new Produto(6, "PenDrive 32GB", 39.90, 20);
+    try {
+      List<Produto> produtos = dao.listarTodos();
+      produtos.forEach(System.out::println);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+
+    //    Produto pendrive = new Produto(6, "PenDrive 32GB", 39.90, 20);
     //    try {
     //      dao.inserir(pendrive);
     //      System.out.println("New ID=" + pendrive.getId());
@@ -33,11 +40,18 @@ public class App {
     //      throw new RuntimeException(e);
     //    }
 
+    //    try {
+    //      pendrive.setPreco(29.90);
+    //      boolean sucesso = dao.atualizar(pendrive);
+    //      System.out.println("✅ Update: " + sucesso);
+    //      System.out.println("Novo: " + dao.buscarPorID(6));
+    //    } catch (SQLException e) {
+    //      throw new RuntimeException(e);
+    //    }
+
     try {
-      pendrive.setPreco(29.90);
-      boolean sucesso = dao.atualizar(pendrive);
-      System.out.println("✅ Update: " + sucesso);
-      System.out.println("Novo: " + dao.buscarPorID(6));
+      boolean deletado = dao.deletar(7);
+      System.out.println("Deletado ID 7: " + deletado);
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
