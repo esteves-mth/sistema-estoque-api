@@ -16,88 +16,78 @@ public class EstoqueDAO {
 
   public List<Produto> listarTodos() throws SQLException {
     List<Produto> list = new ArrayList<>();
-    try {
-      Connection conn = cf.getConnection();
-      Statement stmt = conn.createStatement();
-      ResultSet rs = stmt.executeQuery("select * from produtos");
+    String sql = "select * from produtos";
+    try (Connection conn = cf.getConnection();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql); ) {
       while (rs.next()) {
         Produto p =
-            new Produto(
-                rs.getInt("id"),
-                rs.getString("nome"),
-                rs.getDouble("preco"),
-                rs.getInt("quantidade"));
+                new Produto(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getDouble("preco"),
+                        rs.getInt("quantidade"));
         list.add(p);
       }
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
+      return list;
     }
-    return list;
   }
 
   public Produto buscarPorID(int id) throws SQLException {
     String sql = "select * from produtos where id = ?";
-    try {
-      Connection conn = cf.getConnection();
-      PreparedStatement pstmt = conn.prepareStatement(sql);
+    try (Connection conn = cf.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql); ) {
       pstmt.setInt(1, id);
-      ResultSet rs = pstmt.executeQuery();
-      if (rs.next()) {
-        return new Produto(
-            rs.getInt("id"), rs.getString("nome"), rs.getDouble("preco"), rs.getInt("quantidade"));
+      try (ResultSet rs = pstmt.executeQuery(); ) {
+        if (rs.next()) {
+          return new Produto(
+                  rs.getInt("id"),
+                  rs.getString("nome"),
+                  rs.getDouble("preco"),
+                  rs.getInt("quantidade"));
+        }
+        return null;
       }
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
     }
-    return null;
   }
 
   public void inserir(Produto produto) throws SQLException {
-    try {
-      Connection conn = cf.getConnection();
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              "insert into produtos (nome, preco, quantidade) values (?, ?, ?)",
-              Statement.RETURN_GENERATED_KEYS);
-
+    String sql = "insert into produtos (nome, preco, quantidade) values (?, ?, ?)";
+    try (Connection conn = cf.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); ) {
       pstmt.setString(1, produto.getNome());
       pstmt.setDouble(2, produto.getPreco());
       pstmt.setInt(3, produto.getQuantidade());
 
       pstmt.executeUpdate();
-      ResultSet generatedKeys = pstmt.getGeneratedKeys();
-
-      if (generatedKeys.next()) {
-        produto.setId(generatedKeys.getInt(1));
+      try (ResultSet generatedKeys = pstmt.getGeneratedKeys(); ) {
+        if (generatedKeys.next()) {
+          produto.setId(generatedKeys.getInt(1));
+        }
       }
-
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
     }
   }
 
   public boolean atualizar(Produto produto) throws SQLException {
-    try {
-      Connection conn = cf.getConnection();
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              "update produtos set nome = ?, preco = ?, quantidade = ? where id = ?");
+    String sql = "update produtos set nome = ?, preco = ?, quantidade = ? where id = ?";
+    try (Connection conn = cf.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
       pstmt.setString(1, produto.getNome());
       pstmt.setDouble(2, produto.getPreco());
       pstmt.setInt(3, produto.getQuantidade());
       pstmt.setInt(4, produto.getId());
       int rows = pstmt.executeUpdate();
       return rows > 0;
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
     }
   }
 
   public boolean deletar(int id) throws SQLException {
-    Connection conn = cf.getConnection();
-    PreparedStatement pstmt = conn.prepareStatement("delete from produtos where id = ?");
-    pstmt.setInt(1, id);
-    int rows = pstmt.executeUpdate();
-    return rows > 0;
+    String sql = "delete from produtos where id = ?";
+    try (Connection conn = cf.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql); ) {
+      pstmt.setInt(1, id);
+      int rows = pstmt.executeUpdate();
+      return rows > 0;
+    }
   }
 }
