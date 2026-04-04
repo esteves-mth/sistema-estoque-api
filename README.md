@@ -1,4 +1,4 @@
-# Sistema Estoque API
+# Sistema Estoque CRUD
 
 Sistema simples de gerenciamento de estoque em Java, com CRUD completo usando MySQL.
 
